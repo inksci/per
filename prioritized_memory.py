@@ -27,7 +27,7 @@ class Memory:  # stored as ( s, a, r, s_ ) in SumTree
 
         self.beta = np.min([1., self.beta + self.beta_increment_per_sampling])
 
-        for i in range(n):
+        for i in range(n-1):
             a = segment * i
             b = segment * (i + 1)
 
@@ -36,6 +36,17 @@ class Memory:  # stored as ( s, a, r, s_ ) in SumTree
             priorities.append(p)
             batch.append(data)
             idxs.append(idx)
+            
+        # last one -- ai@inksci.com
+        i = n-1
+        data = 0
+        while data==0:
+            # 重新采样
+            s = random.uniform(a, b)
+            (idx, p, data) = self.tree.get(s)
+        priorities.append(p)
+        batch.append(data)
+        idxs.append(idx)
 
         sampling_probabilities = priorities / self.tree.total()
         is_weight = np.power(self.tree.n_entries * sampling_probabilities, -self.beta)
